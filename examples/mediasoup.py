@@ -16,7 +16,7 @@ from pymediasoup.data_producer import DataProducer
 from pymediasoup.sctp_parameters import SctpStreamParameters
 
 # Import aiortc
-from aiortc import VideoStreamTrack
+from aiortc import VideoStreamTrack,RTCIceServer
 from aiortc.mediastreams import AudioStreamTrack
 from aiortc.contrib.media import MediaPlayer, MediaBlackhole, MediaRecorder
 
@@ -42,6 +42,16 @@ class Demo:
         self._answers: Dict[str, Future] = {}
         self._websocket = None
         self._device = None
+
+        # ice Server
+
+        self.ice_servers = [
+            RTCIceServer(
+                urls='turn:148.113.140.112:3479?transport=udp',
+                username='mobiera',
+                credential='L971EHmpPe'
+            )
+        ]
 
         self._tracks = []
 
@@ -190,6 +200,8 @@ class Demo:
             iceCandidates=ans["data"]["iceCandidates"],
             dtlsParameters=ans["data"]["dtlsParameters"],
             sctpParameters=ans["data"]["sctpParameters"],
+            iceServers=self.ice_servers,
+            iceTransportPolicy='relay'
         )
 
         @self._sendTransport.on("connect")
@@ -331,6 +343,8 @@ class Demo:
             iceCandidates=ans["data"]["iceCandidates"],
             dtlsParameters=ans["data"]["dtlsParameters"],
             sctpParameters=ans["data"]["sctpParameters"],
+            iceServers=self.ice_servers,
+            iceTransportPolicy='relay'
         )
 
         @self._recvTransport.on("connect")
@@ -408,7 +422,7 @@ if __name__ == "__main__":
         args.room = secrets.token_urlsafe(8).lower()
     peerId = secrets.token_urlsafe(8).lower()
 
-    uri = f"wss://v3demo.mediasoup.org:4443/?roomId={args.room}&peerId={peerId}"
+    uri = f"wss://dts-webrtc.dev.2060.io:443/?roomId={args.room}&peerId={peerId}"
 
     if args.play_from:
         player = MediaPlayer(args.play_from)
